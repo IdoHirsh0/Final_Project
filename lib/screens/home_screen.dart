@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/auth/google_auth.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -8,7 +11,10 @@ class HomeScreen extends StatelessWidget {
         title: Text('Home Screen'),
       ),
       body: Center(
-        child: Text('Home Screen'),
+        child: RaisedButton(
+          child: Text('Sign out'),
+          onPressed: Provider.of<Auth>(context, listen: false).signOutGoogle,
+        ),
       ),
     );
   }

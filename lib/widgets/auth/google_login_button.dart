@@ -1,51 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 
-import '../../screens/home_screen.dart';
 import '../../providers/auth/google_auth.dart';
 
-class LoginPage extends StatefulWidget {
-  @override
-  _LoginPageState createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  User user;
-
-  // Logout of google account
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   signOutGoogle();
-  // }
+class GoogleLoginButton extends StatelessWidget {
+  void buttonPressed(BuildContext context) async {
+    print('Sign in google');
+    await Provider.of<Auth>(context, listen: false).signInWithGoogle();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Align(
-        alignment: Alignment.center,
-        child: googleLoginButton(),
-      ),
-    );
-  }
-
-  void click() {
-    signInWithGoogle().then(
-      (user) => {
-        this.user = user,
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HomeScreen(),
-          ),
-        ),
-      },
-    );
-  }
-
-  Widget googleLoginButton() {
     return OutlineButton(
-      onPressed: this.click,
+      onPressed: () {
+        buttonPressed(context);
+      },
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(45),
       ),
