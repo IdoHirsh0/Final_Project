@@ -2,16 +2,39 @@ import 'package:flutter/material.dart';
 
 import '../../constants.dart';
 
+import '../../screens/auth/login_screen.dart';
+
 class SecretCodeScreen extends StatefulWidget {
+  static const routeName = '/secret-code-screen';
+
   @override
   _SecretCodeScreenState createState() => _SecretCodeScreenState();
 }
 
 class _SecretCodeScreenState extends State<SecretCodeScreen> {
   final _formKey = GlobalKey<FormState>();
-
-  String _secretCode = '';
   bool _showPassword = false;
+  String _secretCode;
+
+  bool _firebaseValidation() {
+    // Add firebase validation to check users secret code.
+  }
+
+  void _saveForm() {
+    final isLocalValid = _formKey.currentState.validate();
+    if (!isLocalValid) {
+      return;
+    }
+    _formKey.currentState.save();
+    // Goes to the next screen
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LoginScreen(secretCode: _secretCode),
+      ),
+      (Route<dynamic> route) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +44,7 @@ class _SecretCodeScreenState extends State<SecretCodeScreen> {
           child: Stack(
             children: [
               Container(
-                height: MediaQuery.of(context).size.height * 0.5,
+                height: MediaQuery.of(context).size.height * 0.6,
                 width: MediaQuery.of(context).size.width,
                 child: Container(
                   decoration: BoxDecoration(
@@ -34,12 +57,10 @@ class _SecretCodeScreenState extends State<SecretCodeScreen> {
                 ),
               ),
               Column(
-                // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  SizedBox(height: 50),
                   _buildImage(),
                   _buildLogo(),
-                  SizedBox(height: 80),
                   _buildSecretCodeForm(),
                 ],
               ),
@@ -50,97 +71,50 @@ class _SecretCodeScreenState extends State<SecretCodeScreen> {
     );
   }
 
-  void _saveFormVariables() {
-    _formKey.currentState.save();
-    _formKey.currentState.reset();
-    setState(() {
-      _secretCode = '';
-    });
-  }
-
-  void _saveForm(String value) {
-    _secretCode = value;
-    // Add validation with firebase
-  }
-
-  Widget _buildLogo() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 70),
-          child: Text(
-            'APP NAME',
-            style: TextStyle(
-              fontSize: MediaQuery.of(context).size.height / 25,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-        )
-      ],
-    );
-  }
-
   Widget _buildImage() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 70),
-          child: Text(
-            'IMAGE',
-            style: TextStyle(
-              fontSize: MediaQuery.of(context).size.height / 25,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-        )
-      ],
-    );
-  }
-
-  Widget _buildForgetPasswordButton() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        FlatButton(
-          onPressed: () {
-            // Forgot password function...
-          },
-          child: Text("Forgot Password?"),
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 70),
+              child: Text(
+                'IMAGE',
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.height / 25,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            )
+          ],
         ),
       ],
     );
   }
 
-  Widget _buildConfirmButton() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Container(
-          height: 1.4 * (MediaQuery.of(context).size.height / 20),
-          width: 5 * (MediaQuery.of(context).size.width / 10),
-          margin: EdgeInsets.only(bottom: 20),
-          child: RaisedButton(
-            elevation: 5.0,
-            color: mainColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30.0),
-            ),
-            onPressed: _saveFormVariables,
-            child: Text(
-              "Confirm",
-              style: TextStyle(
-                color: Colors.white,
-                letterSpacing: 1.5,
-                fontSize: MediaQuery.of(context).size.height / 40,
+  Widget _buildLogo() {
+    return Column(
+      children: [
+        SizedBox(height: 50),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 70),
+              child: Text(
+                'APP NAME',
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.height / 25,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
-            ),
-          ),
-        )
+            )
+          ],
+        ),
+        SizedBox(height: 75),
       ],
     );
   }
@@ -156,53 +130,97 @@ class _SecretCodeScreenState extends State<SecretCodeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 TextFormField(
+                  obscureText: !_showPassword,
+                  textInputAction: TextInputAction.done,
+                  keyboardType: TextInputType.visiblePassword,
                   decoration: InputDecoration(
                     border:
                         OutlineInputBorder(borderSide: BorderSide(width: 1)),
                     labelText: 'Your Secret Code',
+                    // Show text or not
                     suffixIcon: GestureDetector(
                       onTap: () {
                         setState(() {
                           _showPassword = !_showPassword;
                         });
                       },
-                      child: Icon(_showPassword
-                          ? Icons.visibility
-                          : Icons.visibility_off),
+                      child: Icon(
+                        _showPassword ? Icons.visibility : Icons.visibility_off,
+                      ),
                     ),
                   ),
-                  obscureText: !_showPassword,
-                  textInputAction: TextInputAction.done,
-                  keyboardType: TextInputType.visiblePassword,
-                  // validator: (value) {
-                  //   if (value.isEmpty) {
-                  //     return 'Please enter your secret code.';
-                  //   }
-                  //   return null;
-                  // },
-                  onFieldSubmitted: (_) {
-                    _saveFormVariables();
+                  // Validation when _saveForm() is trigred
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please enter your secret code.';
+                    }
+                    // Add firebase validation...
+                    return null;
                   },
-                  onSaved: (value) {
-                    _saveForm(value);
-                  },
-                  onChanged: (value) {
-                    setState(() {
-                      _secretCode = value;
-                    });
+                  // When done button is trigred
+                  onFieldSubmitted: (value) {
+                    _secretCode = value;
+                    _saveForm();
                   },
                 ),
                 _buildForgetPasswordButton(),
+                SizedBox(height: 30),
+                _buildConfirmButton(),
               ],
             ),
           ),
         ),
-        SizedBox(height: MediaQuery.of(context).size.height * 0.075),
-        GestureDetector(
-          child: _buildConfirmButton(),
-          onTap: _secretCode != '' ? _saveFormVariables : null,
-          // Add navigation to next step...
+      ],
+    );
+  }
+
+  Widget _buildForgetPasswordButton() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            FlatButton(
+              // On Pressed
+              onPressed: () {
+                // Forgot password function...
+              },
+              child: Text("Forgot Password?"),
+            ),
+          ],
         ),
+        SizedBox(height: 10),
+      ],
+    );
+  }
+
+  Widget _buildConfirmButton() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          height: 1.4 * (MediaQuery.of(context).size.height / 20),
+          width: 5 * (MediaQuery.of(context).size.width / 10),
+          margin: EdgeInsets.only(bottom: 20),
+          child: RaisedButton(
+            elevation: 5.0,
+            color: mainColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30.0),
+            ),
+            // On pressed
+            onPressed: _saveForm,
+            child: Text(
+              "Confirm",
+              style: TextStyle(
+                color: Colors.white,
+                letterSpacing: 1.5,
+                fontSize: MediaQuery.of(context).size.height / 40,
+              ),
+            ),
+          ),
+        )
       ],
     );
   }

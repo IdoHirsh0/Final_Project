@@ -49,6 +49,10 @@ class MyApp extends StatelessWidget {
             return SecretCodeScreen();
           },
         ),
+        routes: {
+          HomeScreen.routeName: (ctx) => HomeScreen(),
+          LoginScreen.routeName: (ctx) => LoginScreen(),
+        },
       ),
     );
   }

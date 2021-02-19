@@ -1,28 +1,86 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../providers/auth/google_auth.dart';
 
+import '../../screens/home_screen.dart';
+
 import '../../constants.dart';
 
 class LoginScreen extends StatefulWidget {
+  static const routeName = '/login-screen';
+
+  final String secretCode;
+
+  LoginScreen({@required this.secretCode});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginScreen> {
-  String email, password;
+  String _email, _password;
+  User _user;
 
   void googleSignIn() async {
     print('Sign in google');
-    await Provider.of<Auth>(context, listen: false).signInWithGoogle();
+    final user =
+        await Provider.of<Auth>(context, listen: false).signInWithGoogle();
+    if (user == null) {
+      return;
+    }
+    _user = user;
+    // Goes to the next screen
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HomeScreen(),
+      ),
+      (Route<dynamic> route) => false,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomPadding: false,
+      backgroundColor: secoderyColor,
+      body: SingleChildScrollView(
+        child: Stack(
+          children: [
+            Container(
+              height: MediaQuery.of(context).size.height * 0.6,
+              width: MediaQuery.of(context).size.width,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: mainColor,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: const Radius.circular(70),
+                    bottomRight: const Radius.circular(70),
+                  ),
+                ),
+              ),
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildLogo(),
+                _buildContainer(),
+                _buildSignUpBtn(),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildLogo() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
+      children: [
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 70),
           child: Text(
@@ -38,6 +96,49 @@ class _LoginPageState extends State<LoginScreen> {
     );
   }
 
+  Widget _buildContainer() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.all(
+            Radius.circular(20),
+          ),
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.6,
+            width: MediaQuery.of(context).size.width * 0.8,
+            decoration: BoxDecoration(
+              color: Colors.white,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Login",
+                      style: TextStyle(
+                        fontSize: MediaQuery.of(context).size.height / 30,
+                      ),
+                    ),
+                  ],
+                ),
+                _buildEmailRow(),
+                _buildPasswordRow(),
+                _buildForgetPasswordButton(),
+                _buildLoginButton(),
+                _buildORRow(),
+                _buildGoogleBtn(),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildEmailRow() {
     return Padding(
       padding: EdgeInsets.all(8),
@@ -45,7 +146,7 @@ class _LoginPageState extends State<LoginScreen> {
         keyboardType: TextInputType.emailAddress,
         onChanged: (value) {
           setState(() {
-            email = value;
+            _email = value;
           });
         },
         decoration: InputDecoration(
@@ -65,9 +166,10 @@ class _LoginPageState extends State<LoginScreen> {
       child: TextFormField(
         keyboardType: TextInputType.text,
         obscureText: true,
+        // Save entered _password
         onChanged: (value) {
           setState(() {
-            password = value;
+            _password = value;
           });
         },
         decoration: InputDecoration(
@@ -85,10 +187,10 @@ class _LoginPageState extends State<LoginScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
+      children: [
         FlatButton(
           onPressed: () {
-            // Forgot password function...
+            // Forgot _password function...
           },
           child: Text("Forgot Password?"),
         ),
@@ -99,7 +201,7 @@ class _LoginPageState extends State<LoginScreen> {
   Widget _buildLoginButton() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
+      children: [
         Container(
           height: 1.4 * (MediaQuery.of(context).size.height / 20),
           width: 5 * (MediaQuery.of(context).size.width / 10),
@@ -127,10 +229,10 @@ class _LoginPageState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildOrRow() {
+  Widget _buildORRow() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
+      children: [
         Container(
           margin: EdgeInsets.only(bottom: 20),
           child: Text(
@@ -144,13 +246,13 @@ class _LoginPageState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildSocialBtnRow() {
+  Widget _buildGoogleBtn() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
+      children: [
         GestureDetector(
           onTap: () {
-            // Google login function...
+            // Google sign in
             googleSignIn();
           },
           child: Container(
@@ -177,53 +279,10 @@ class _LoginPageState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildContainer() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        ClipRRect(
-          borderRadius: BorderRadius.all(
-            Radius.circular(20),
-          ),
-          child: Container(
-            height: MediaQuery.of(context).size.height * 0.6,
-            width: MediaQuery.of(context).size.width * 0.8,
-            decoration: BoxDecoration(
-              color: Colors.white,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      "Login",
-                      style: TextStyle(
-                        fontSize: MediaQuery.of(context).size.height / 30,
-                      ),
-                    ),
-                  ],
-                ),
-                _buildEmailRow(),
-                _buildPasswordRow(),
-                _buildForgetPasswordButton(),
-                _buildLoginButton(),
-                _buildOrRow(),
-                _buildSocialBtnRow(),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildSignUpBtn() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
+      children: [
         Padding(
           padding: EdgeInsets.only(top: 40),
           child: FlatButton(
@@ -253,41 +312,6 @@ class _LoginPageState extends State<LoginScreen> {
           ),
         ),
       ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomPadding: false,
-      backgroundColor: Color(0xfff2f3f7),
-      body: SingleChildScrollView(
-        child: Stack(
-          children: <Widget>[
-            Container(
-              height: MediaQuery.of(context).size.height * 0.6,
-              width: MediaQuery.of(context).size.width,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: mainColor,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: const Radius.circular(70),
-                    bottomRight: const Radius.circular(70),
-                  ),
-                ),
-              ),
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                _buildLogo(),
-                _buildContainer(),
-                _buildSignUpBtn(),
-              ],
-            )
-          ],
-        ),
-      ),
     );
   }
 }

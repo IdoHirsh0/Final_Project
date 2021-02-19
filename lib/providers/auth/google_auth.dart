@@ -33,15 +33,10 @@ class Auth with ChangeNotifier {
     return user;
   }
 
-  void signOutGoogle() async {
+  Future<void> signOutGoogle() async {
     await googleSignIn.signOut();
     await FirebaseAuth.instance.signOut();
     print('Sign out Google');
     notifyListeners();
-  }
-
-  // Retures a logged user
-  Future<User> getUser(BuildContext context) async {
-    return this.user;
   }
 }
