@@ -32,23 +32,23 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: SecretCodeScreen(),
+        // home: SecretCodeScreen(),
         // Home directory depends on wether the user is logged in or not
-        // home: StreamBuilder(
-        //   stream: FirebaseAuth.instance.authStateChanges(),
-        //   builder: (ctx, userSnapshot) {
-        //     // Waiting
-        //     if (userSnapshot.connectionState == ConnectionState.waiting) {
-        //       return SplashScreen();
-        //     }
-        //     // Logged in
-        //     if (userSnapshot.hasData) {
-        //       return HomeScreen();
-        //     }
-        //     // Logged out
-        //     return LoginScreen();
-        //   },
-        // ),
+        home: StreamBuilder(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (ctx, userSnapshot) {
+            // Waiting
+            if (userSnapshot.connectionState == ConnectionState.waiting) {
+              return SplashScreen();
+            }
+            // Logged in
+            if (userSnapshot.hasData) {
+              return HomeScreen();
+            }
+            // Logged out
+            return SecretCodeScreen();
+          },
+        ),
       ),
     );
   }
