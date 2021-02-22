@@ -74,21 +74,11 @@ class _SecretCodeScreenState extends State<SecretCodeScreen> {
   Widget _buildImage() {
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 70),
-              child: Text(
-                'IMAGE',
-                style: TextStyle(
-                  fontSize: MediaQuery.of(context).size.height / 25,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            )
-          ],
+        SizedBox(height: 50),
+        Container(
+          height: 250,
+          width: 300,
+          child: Placeholder(),
         ),
       ],
     );
@@ -97,7 +87,6 @@ class _SecretCodeScreenState extends State<SecretCodeScreen> {
   Widget _buildLogo() {
     return Column(
       children: [
-        SizedBox(height: 50),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -114,7 +103,6 @@ class _SecretCodeScreenState extends State<SecretCodeScreen> {
             )
           ],
         ),
-        SizedBox(height: 75),
       ],
     );
   }

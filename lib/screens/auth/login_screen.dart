@@ -250,7 +250,7 @@ class _LoginPageState extends State<LoginScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        GestureDetector(
+        InkWell(
           onTap: () {
             // Google sign in
             googleSignIn();
